@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register — NEWTON SAFETY VTC</title>
+  <link rel="icon" type="image/x-icon" href="/static/newton-icon.ico" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center font-sans">
+
+  <div class="w-full max-w-sm">
+    <!-- Logo / Title -->
+    <div class="text-center mb-8">
+      <img src="/static/newton-logo-png.png" alt="Newton Safety VTC" class="h-16 w-auto mx-auto mb-4 shadow-lg" />
+      <h1 class="text-2xl font-bold text-gray-800">Candidate Management</h1>
+      <p class="text-sm text-gray-500 mt-1">Create your account</p>
+    </div>
+
+    <!-- Card -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+      <div id="register-error" class="hidden mb-4 px-4 py-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg"></div>
+
+      <form id="register-form" class="space-y-5">
+        <div>
+          <label class="block text-xs font-medium text-gray-600 uppercase tracking-wide mb-1.5">Email</label>
+          <input id="email" type="email" autocomplete="email" required
+            class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-transparent"
+            placeholder="Enter your email" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 uppercase tracking-wide mb-1.5">Username (Optional)</label>
+          <input id="username" type="text" autocomplete="username"
+            class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-transparent"
+            placeholder="Choose a username" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 uppercase tracking-wide mb-1.5">Password</label>
+          <input id="password" type="password" autocomplete="new-password" required
+            class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-transparent"
+            placeholder="Create a password" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 uppercase tracking-wide mb-1.5">Confirm Password</label>
+          <input id="confirm-password" type="password" autocomplete="new-password" required
+            class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-transparent"
+            placeholder="Confirm your password" />
+        </div>
+        <button type="submit" id="register-btn"
+          class="w-full bg-indigo-600 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-indigo-700 transition flex items-center justify-center gap-2">
+          Create Account
+        </button>
+      </form>
+    </div>
+
+    <p class="text-center text-xs text-gray-400 mt-6">
+      Already have an account? <a href="/login" class="text-indigo-600 hover:text-indigo-700 font-medium">Sign in</a>
+    </p>
+  </div>
+
+  <script>
+    // Redirect if already logged in
+    const existingToken = localStorage.getItem("cms_token");
+    if (existingToken) {
+      window.location.replace("/");
+    }
+
+    document.getElementById("register-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("register-btn");
+      const errEl = document.getElementById("register-error");
+      errEl.classList.add("hidden");
+
+      const email = document.getElementById("email").value.trim();
+      const username = document.getElementById("username").value.trim() || "";
+      const password = document.getElementById("password").value;
+      const confirmPassword = document.getElementById("confirm-password").value;
+
+      // Client-side validation
+      if (password !== confirmPassword) {
+        errEl.textContent = "Passwords do not match.";
+        errEl.classList.remove("hidden");
+        return;
+      }
+
+      if (password.length < 6) {
+        errEl.textContent = "Password must be at least 6 characters long.";
+        errEl.classList.remove("hidden");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = `<div class="loader w-4 h-4"></div> Creating account...`;
+
+      try {
+        const res = await fetch("/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: email,
+            username: username || null,
+            password: password,
+          }),
+        });
+        const d = await res.json();
+        if (!res.ok) {
+          errEl.textContent = d.detail || "Registration failed.";
+          errEl.classList.remove("hidden");
+          return;
+        }
+        localStorage.setItem("cms_token", d.access_token);
+        window.location.replace("/");
+      } catch {
+        errEl.textContent = "Could not connect to server.";
+        errEl.classList.remove("hidden");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = "Create Account";
+      }
+    });
+  </script>
+</body>
+</html>

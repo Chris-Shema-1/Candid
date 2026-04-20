@@ -38,6 +38,10 @@ def get_user(db: Session, username: str) -> Optional[models.User]:
     return db.query(models.User).filter(models.User.username == username).first()
 
 
+def get_user_by_email(db: Session, email: str) -> Optional[models.User]:
+    return db.query(models.User).filter(models.User.email == email).first()
+
+
 def authenticate_user(db: Session, username: str, password: str) -> Optional[models.User]:
     user = get_user(db, username)
     if not user or not verify_password(password, user.password_hash):
@@ -45,10 +49,16 @@ def authenticate_user(db: Session, username: str, password: str) -> Optional[mod
     return user
 
 
-def create_user(db: Session, username: str, password: str) -> models.User:
-    if get_user(db, username):
-        raise HTTPException(400, "Username already exists.")
-    user = models.User(username=username, password_hash=hash_password(password))
+def create_user(db: Session, email: str, password: str, username: Optional[str] = None) -> models.User:
+    # Check if email already exists
+    if get_user_by_email(db, email):
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    # Check if username already exists (if provided)
+    if username and get_user(db, username):
+        raise HTTPException(status_code=400, detail="Username already exists")
+    
+    user = models.User(email=email, username=username, password_hash=hash_password(password))
     db.add(user)
     db.commit()
     db.refresh(user)
@@ -77,4 +87,4 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
 def seed_admin(db: Session):
     """Create default admin user if no users exist."""
     if db.query(models.User).count() == 0:
-        create_user(db, "admin", "admin123")
+        create_user(db, "admin@example.com", "admin123", "admin")

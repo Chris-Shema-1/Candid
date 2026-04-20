@@ -64,6 +64,11 @@ def serve_login():
     return FileResponse(os.path.join(STATIC_DIR, "login.html"))
 
 
+@app.get("/register")
+def serve_register():
+    return FileResponse(os.path.join(STATIC_DIR, "register.html"))
+
+
 # ── Auth endpoints ─────────────────────────────────────────────────────────
 @app.post("/login", response_model=schemas.TokenResponse)
 def login(form: schemas.LoginRequest, db: Session = Depends(get_db)):
@@ -74,10 +79,12 @@ def login(form: schemas.LoginRequest, db: Session = Depends(get_db)):
     return schemas.TokenResponse(access_token=token)
 
 
-@app.post("/register", response_model=schemas.TokenResponse)
+@app.post("/register")
 def register(form: schemas.RegisterRequest, db: Session = Depends(get_db)):
-    user = auth.create_user(db, form.username, form.password)
-    token = auth.create_access_token({"sub": user.username})
+    # Use email as username if no username provided
+    username = form.username or form.email
+    user = auth.create_user(db, form.email, form.password, username)
+    token = auth.create_access_token({"sub": username})
     return schemas.TokenResponse(access_token=token)
 
 

@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login — Candidate Management System</title>
+  <title>Login — NEWTON SAFETY VTC</title>
+  <link rel="icon" type="image/x-icon" href="/static/newton-icon.ico" />
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="/static/styles.css" />
 </head>
@@ -12,13 +13,8 @@
   <div class="w-full max-w-sm">
     <!-- Logo / Title -->
     <div class="text-center mb-8">
-      <div class="inline-flex items-center justify-center w-14 h-14 bg-indigo-600 rounded-2xl mb-4 shadow-lg">
-        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M17 20h5v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2h5M12 12a4 4 0 100-8 4 4 0 000 8z"/>
-        </svg>
-      </div>
-      <h1 class="text-2xl font-bold text-gray-800">Candidate Management</h1>
+      <img src="/static/newton-logo-png.png" alt="Newton Safety VTC" class="h-32 w-auto mx-auto mb-4 shadow-lg" />
+      <h1 class="text-2xl font-bold text-gray-800">NEWTON SAFETY VTC</h1>
       <p class="text-sm text-gray-500 mt-1">Sign in to your account</p>
     </div>
 
@@ -46,7 +42,10 @@
       </form>
     </div>
 
-    <p class="text-center text-xs text-gray-400 mt-6">Default: admin / admin123</p>
+    <p class="text-center text-xs text-gray-400 mt-6">
+      Don't have an account? <a href="/register" class="text-indigo-600 hover:text-indigo-700 font-medium">Sign up</a>
+    </p>
+    <p class="text-center text-xs text-gray-400 mt-2">Default: admin / admin123</p>
   </div>
 
   <script>

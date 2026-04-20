@@ -37,9 +37,12 @@ OPTIONAL_EXTRA_COLUMNS = [
 
 
 def normalize_columns(df: pd.DataFrame) -> pd.DataFrame:
+    # Step 1: Strip whitespace and convert to lowercase
     df.columns = [c.strip().lower() for c in df.columns]
-    df.rename(columns={k: v for k, v in COLUMN_MAP.items() if k in df.columns}, inplace=True)
+    # Step 2: Replace spaces with underscores (BEFORE mapping for better alias matching)
     df.columns = [c.replace(" ", "_") for c in df.columns]
+    # Step 3: Map aliases to canonical column names
+    df.rename(columns={k: v for k, v in COLUMN_MAP.items() if k in df.columns}, inplace=True)
     return df
 
 
