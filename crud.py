@@ -30,6 +30,28 @@ def get_employees(
     return query.offset(skip).limit(limit).all(), total
 
 
+def get_employees_for_export(
+    db: Session,
+    search: Optional[str] = None,
+    trade: Optional[str] = None,
+    status: Optional[str] = None,
+) -> List[Employee]:
+    query = db.query(Employee)
+    if search:
+        query = query.filter(
+            or_(
+                Employee.name.ilike(f"%{search}%"),
+                Employee.national_id.ilike(f"%{search}%"),
+                Employee.phone.ilike(f"%{search}%"),
+            )
+        )
+    if trade:
+        query = query.filter(Employee.trade.ilike(f"%{trade}%"))
+    if status:
+        query = query.filter(Employee.status == status)
+    return query.all()
+
+
 def get_employee(db: Session, employee_id: int):
     return db.query(Employee).filter(Employee.id == employee_id).first()
 
@@ -37,9 +59,7 @@ def get_employee(db: Session, employee_id: int):
 def bulk_insert_employees(db: Session, employees: List[EmployeeCreate]):
     inserted = 0
     duplicates = 0
-    existing_ids = {
-        row[0] for row in db.query(Employee.national_id).all()
-    }
+    existing_ids = {row[0] for row in db.query(Employee.national_id).all()}
     new_records = []
     for emp in employees:
         if emp.national_id in existing_ids:

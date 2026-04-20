@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login — Candidate Management System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center font-sans">
+
+  <div class="w-full max-w-sm">
+    <!-- Logo / Title -->
+    <div class="text-center mb-8">
+      <div class="inline-flex items-center justify-center w-14 h-14 bg-indigo-600 rounded-2xl mb-4 shadow-lg">
+        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M17 20h5v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2h5M12 12a4 4 0 100-8 4 4 0 000 8z"/>
+        </svg>
+      </div>
+      <h1 class="text-2xl font-bold text-gray-800">Candidate Management</h1>
+      <p class="text-sm text-gray-500 mt-1">Sign in to your account</p>
+    </div>
+
+    <!-- Card -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+      <div id="login-error" class="hidden mb-4 px-4 py-3 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg"></div>
+
+      <form id="login-form" class="space-y-5">
+        <div>
+          <label class="block text-xs font-medium text-gray-600 uppercase tracking-wide mb-1.5">Username</label>
+          <input id="username" type="text" autocomplete="username" required
+            class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-transparent"
+            placeholder="Enter username" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-gray-600 uppercase tracking-wide mb-1.5">Password</label>
+          <input id="password" type="password" autocomplete="current-password" required
+            class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-transparent"
+            placeholder="Enter password" />
+        </div>
+        <button type="submit" id="login-btn"
+          class="w-full bg-indigo-600 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-indigo-700 transition flex items-center justify-center gap-2">
+          Sign In
+        </button>
+      </form>
+    </div>
+
+    <p class="text-center text-xs text-gray-400 mt-6">Default: admin / admin123</p>
+  </div>
+
+  <script>
+    // Redirect if already logged in
+    const existingToken = localStorage.getItem("cms_token");
+    if (existingToken) {
+      window.location.replace("/");
+    }
+
+    document.getElementById("login-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("login-btn");
+      const errEl = document.getElementById("login-error");
+      errEl.classList.add("hidden");
+      btn.disabled = true;
+      btn.innerHTML = `<div class="loader w-4 h-4"></div> Signing in...`;
+
+      try {
+        const res = await fetch("/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            username: document.getElementById("username").value.trim(),
+            password: document.getElementById("password").value,
+          }),
+        });
+        const d = await res.json();
+        if (!res.ok) {
+          errEl.textContent = d.detail || "Login failed.";
+          errEl.classList.remove("hidden");
+          return;
+        }
+        localStorage.setItem("cms_token", d.access_token);
+        window.location.replace("/");
+      } catch {
+        errEl.textContent = "Could not connect to server.";
+        errEl.classList.remove("hidden");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = "Sign In";
+      }
+    });
+  </script>
+</body>
+</html>

@@ -41,3 +41,42 @@ tbody tr:hover { background: #f8faff; cursor: pointer; }
   border-color: #4f46e5;
   background: #eef2ff;
 }
+
+/* Modal view mode — readonly fields look like plain text */
+.modal-view input[readonly],
+.modal-view textarea[readonly] {
+  background: transparent;
+  border-color: transparent;
+  cursor: default;
+  color: #374151;
+  padding-left: 0;
+  box-shadow: none;
+}
+.modal-view input[readonly]:focus,
+.modal-view textarea[readonly]:focus {
+  outline: none;
+  ring: none;
+  box-shadow: none;
+}
+.modal-view select[aria-readonly="true"] {
+  background: transparent;
+  border-color: transparent;
+  cursor: default;
+  color: #374151;
+  pointer-events: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+/* Hide edu tag remove buttons and input in view mode */
+.modal-view #edu-tags-container button { display: none; }
+.modal-view #m-edu-edit { display: none; }
+.modal-view .edu-hint { display: none; }
+.modal-view #edu-tags-container {
+  border-color: transparent;
+  background: transparent;
+  padding-left: 0;
+  cursor: default;
+}
+/* Hide doc upload in view mode */
+.modal-view #m-doc-upload { display: none; }
+.modal-view .doc-upload-label { display: none; }

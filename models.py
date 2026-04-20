@@ -3,6 +3,15 @@ from sqlalchemy.sql import func
 from database import Base
 
 
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True, nullable=False)
+    password_hash = Column(String, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
 class Employee(Base):
     __tablename__ = "employees"
 
@@ -15,4 +24,10 @@ class Employee(Base):
     education = Column(String)
     status = Column(String, default="Pending")
     remarks = Column(String)
+    # Extended fields
+    driving_license_no = Column(String)
+    driving_license_type = Column(String)
+    last_employer = Column(String)
+    supporting_doc_path = Column(String)
+    age = Column(Integer)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
